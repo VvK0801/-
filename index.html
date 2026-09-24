@@ -1,1 +1,1223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Последний свет</title>
 
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #070b18;
+    color: white;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* =========================
+   GAME
+========================= */
+
+#game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 70% 18%, rgba(130,160,255,.20), transparent 18%),
+        linear-gradient(#080c21 0%, #111b3c 52%, #19223d 100%);
+}
+
+/* Stars */
+
+.star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    opacity: .8;
+    animation: twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle {
+    from { opacity: .2; transform: scale(.7); }
+    to { opacity: 1; transform: scale(1.4); }
+}
+
+/* Moon */
+
+#moon {
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    right: 10%;
+    top: 8%;
+    background: #fff8d6;
+    box-shadow:
+        0 0 30px rgba(255,245,190,.7),
+        0 0 100px rgba(170,190,255,.25);
+}
+
+/* City */
+
+#city {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 31%;
+    height: 30%;
+}
+
+.house {
+    position: absolute;
+    bottom: 0;
+    width: 110px;
+    background: #12182c;
+    border: 2px solid #202946;
+}
+
+.house:nth-child(1) {
+    left: 5%;
+    height: 75%;
+}
+
+.house:nth-child(2) {
+    left: 22%;
+    height: 90%;
+}
+
+.house:nth-child(3) {
+    left: 44%;
+    height: 65%;
+}
+
+.house:nth-child(4) {
+    left: 68%;
+    height: 82%;
+}
+
+.house:nth-child(5) {
+    left: 86%;
+    height: 58%;
+}
+
+.window {
+    position: absolute;
+    width: 18px;
+    height: 24px;
+    background: #f4d47b;
+    box-shadow: 0 0 12px #e9c65d;
+}
+
+.w1 { left: 20px; top: 25px; }
+.w2 { right: 20px; top: 25px; }
+.w3 { left: 20px; bottom: 30px; }
+.w4 { right: 20px; bottom: 30px; }
+
+/* Ground */
+
+#ground {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 32%;
+    background:
+        radial-gradient(circle at 20% 50%, rgba(56,85,83,.4), transparent 20%),
+        linear-gradient(#16283a, #0c1724);
+    border-top: 2px solid rgba(150,170,210,.15);
+}
+
+/* Road */
+
+#road {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 4%;
+    height: 30%;
+    background: #111b29;
+    transform: perspective(300px) rotateX(20deg);
+    transform-origin: bottom;
+    opacity: .8;
+}
+
+/* =========================
+   PLAYER
+========================= */
+
+.character {
+    position: absolute;
+    width: 60px;
+    height: 110px;
+    z-index: 20;
+    transition: transform .08s linear;
+}
+
+.character .head {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    left: 9px;
+    top: 0;
+    border-radius: 50%;
+    background: #e9b58e;
+    box-shadow: inset -4px -4px rgba(0,0,0,.08);
+}
+
+.character .hair {
+    position: absolute;
+    width: 48px;
+    height: 34px;
+    left: 6px;
+    top: -4px;
+    border-radius: 50% 50% 35% 35%;
+    background: #432b37;
+    z-index: 2;
+}
+
+.character .eye {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #191424;
+    top: 20px;
+    z-index: 4;
+}
+
+.character .eye.left { left: 18px; }
+.character .eye.right { right: 18px; }
+
+.character .body {
+    position: absolute;
+    width: 46px;
+    height: 55px;
+    left: 7px;
+    top: 38px;
+    border-radius: 18px 18px 8px 8px;
+    background: #6675b8;
+}
+
+.character .leg {
+    position: absolute;
+    width: 12px;
+    height: 35px;
+    top: 87px;
+    background: #272b47;
+    border-radius: 5px;
+}
+
+.character .leg.left { left: 15px; }
+.character .leg.right { right: 15px; }
+
+#player {
+    left: 40%;
+    bottom: 25%;
+}
+
+/* walking animation */
+
+.walking .leg.left {
+    animation: walkLeft .22s infinite alternate;
+}
+
+.walking .leg.right {
+    animation: walkRight .22s infinite alternate;
+}
+
+@keyframes walkLeft {
+    to { transform: rotate(15deg); }
+}
+
+@keyframes walkRight {
+    to { transform: rotate(-15deg); }
+}
+
+/* NPC */
+
+#luna {
+    left: 62%;
+    bottom: 25%;
+}
+
+#luna .body {
+    background: #8068ba;
+}
+
+#luna .hair {
+    background: #d5d9ff;
+}
+
+/* =========================
+   UI
+========================= */
+
+#topbar {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    top: 18px;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 22px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px #8298ff;
+}
+
+.stats {
+    display: flex;
+    gap: 10px;
+}
+
+.stat {
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 12px;
+    background: rgba(8,12,30,.55);
+    backdrop-filter: blur(10px);
+}
+
+/* Dialogue */
+
+#dialogue {
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    bottom: 4%;
+    z-index: 200;
+    padding: 20px;
+    border-radius: 22px;
+    background: rgba(7,10,24,.90);
+    border: 1px solid rgba(180,195,255,.25);
+    box-shadow: 0 15px 50px rgba(0,0,0,.4);
+    backdrop-filter: blur(15px);
+    display: none;
+}
+
+#speaker {
+    color: #c9d2ff;
+    font-size: 19px;
+    margin-bottom: 8px;
+}
+
+#text {
+    font-size: 20px;
+    line-height: 1.45;
+    min-height: 55px;
+}
+
+#choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.choice {
+    padding: 11px 16px;
+    border: 1px solid rgba(160,180,255,.35);
+    border-radius: 12px;
+    background: rgba(70,85,150,.3);
+    color: white;
+    transition: .2s;
+}
+
+.choice:hover {
+    background: rgba(100,120,210,.55);
+    transform: translateY(-2px);
+}
+
+/* Buttons */
+
+#controls {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    z-index: 250;
+    display: flex;
+    gap: 8px;
+}
+
+.control {
+    padding: 10px 14px;
+    background: rgba(10,15,30,.7);
+    color: white;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 12px;
+}
+
+/* Quest */
+
+#quest {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    z-index: 100;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: rgba(8,12,25,.7);
+    border: 1px solid rgba(255,255,255,.15);
+    max-width: 300px;
+}
+
+/* Notification */
+
+#notification {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    z-index: 500;
+    opacity: 0;
+    padding: 12px 18px;
+    border-radius: 14px;
+    background: rgba(20,28,55,.95);
+    border: 1px solid rgba(190,200,255,.3);
+    transition: .3s;
+}
+
+#notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Mini game */
+
+#minigame {
+    position: absolute;
+    inset: 0;
+    z-index: 600;
+    background: rgba(3,6,18,.94);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.gamebox {
+    width: min(600px,90%);
+    padding: 30px;
+    border-radius: 25px;
+    background: #10172d;
+    border: 1px solid rgba(180,190,255,.25);
+    text-align: center;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.card {
+    height: 90px;
+    border-radius: 12px;
+    border: 1px solid #45527c;
+    background: #202b50;
+    font-size: 30px;
+    color: transparent;
+}
+
+.card.open {
+    color: white;
+    background: #46558b;
+}
+
+@media(max-width:700px) {
+    #text {
+        font-size: 16px;
+    }
+
+    .stats {
+        display: none;
+    }
+
+    #moon {
+        width: 80px;
+        height: 80px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <div id="topbar">
+        <div class="logo">ПОСЛЕДНИЙ СВЕТ</div>
+
+        <div class="stats">
+            <div class="stat">✦ <span id="stars">0</span></div>
+            <div class="stat">♥ <span id="trust">0</span></div>
+            <div class="stat">🎒 <span id="items">0</span></div>
+        </div>
+    </div>
+
+    <div id="moon"></div>
+
+    <!-- stars -->
+    <div class="star" style="left:8%;top:15%"></div>
+    <div class="star" style="left:15%;top:30%"></div>
+    <div class="star" style="left:25%;top:12%"></div>
+    <div class="star" style="left:35%;top:22%"></div>
+    <div class="star" style="left:45%;top:8%"></div>
+    <div class="star" style="left:54%;top:27%"></div>
+    <div class="star" style="left:63%;top:12%"></div>
+    <div class="star" style="left:75%;top:28%"></div>
+    <div class="star" style="left:84%;top:18%"></div>
+    <div class="star" style="left:93%;top:35%"></div>
+
+    <div id="city">
+        <div class="house">
+            <div class="window w1"></div>
+            <div class="window w2"></div>
+        </div>
+
+        <div class="house">
+            <div class="window w1"></div>
+            <div class="window w4"></div>
+        </div>
+
+        <div class="house">
+            <div class="window w2"></div>
+            <div class="window w3"></div>
+        </div>
+
+        <div class="house">
+            <div class="window w1"></div>
+            <div class="window w3"></div>
+        </div>
+
+        <div class="house">
+            <div class="window w2"></div>
+        </div>
+    </div>
+
+    <div id="ground"></div>
+    <div id="road"></div>
+
+    <!-- PLAYER -->
+
+    <div id="player" class="character">
+        <div class="hair"></div>
+        <div class="head">
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+        </div>
+        <div class="body"></div>
+        <div class="leg left"></div>
+        <div class="leg right"></div>
+    </div>
+
+    <!-- LUNA -->
+
+    <div id="luna" class="character">
+        <div class="hair"></div>
+        <div class="head">
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+        </div>
+        <div class="body"></div>
+        <div class="leg left"></div>
+        <div class="leg right"></div>
+    </div>
+
+    <div id="quest">
+        ✦ <b>Задание</b><br>
+        Найди Луну и поговори с ней.
+    </div>
+
+    <div id="controls">
+        <button class="control" onclick="saveGame()">💾 Сохранить</button>
+        <button class="control" onclick="loadGame()">↩ Загрузить</button>
+        <button class="control" onclick="startMemoryGame()">🧩 Задание</button>
+    </div>
+
+    <div id="notification"></div>
+
+    <!-- DIALOGUE -->
+
+    <div id="dialogue">
+        <div id="speaker"></div>
+        <div id="text"></div>
+        <div id="choices"></div>
+    </div>
+
+    <!-- MINI GAME -->
+
+    <div id="minigame">
+
+        <div class="gamebox">
+
+            <h2>Воспоминание о звёздах</h2>
+
+            <p style="margin-top:10px;color:#b8c0dd">
+                Найди одинаковые символы.
+            </p>
+
+            <div id="cards" class="cards"></div>
+
+            <button class="control" style="margin-top:20px"
+                    onclick="closeMemoryGame()">
+                Выйти
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =====================================
+   GAME STATE
+===================================== */
+
+const state = {
+
+    x: 40,
+    y: 25,
+
+    speed: 0.55,
+
+    trust: 0,
+    stars: 0,
+
+    inventory: [],
+
+    flags: {
+        metLuna: false,
+        trustedLuna: false,
+        liedToLuna: false,
+        foundStar: false,
+        memorySolved: false
+    },
+
+    dialogueOpen: false
+};
+
+
+/* =====================================
+   PLAYER MOVEMENT
+===================================== */
+
+const player = document.getElementById("player");
+
+const keys = {};
+
+document.addEventListener("keydown", e => {
+
+    keys[e.key.toLowerCase()] = true;
+
+    if (
+        ["arrowup","arrowdown","arrowleft","arrowright","w","a","s","d"]
+        .includes(e.key.toLowerCase())
+    ) {
+        e.preventDefault();
+    }
+});
+
+document.addEventListener("keyup", e => {
+    keys[e.key.toLowerCase()] = false;
+});
+
+function movementLoop() {
+
+    if (!state.dialogueOpen) {
+
+        let moving = false;
+
+        if (keys["a"] || keys["arrowleft"]) {
+            state.x -= state.speed;
+            moving = true;
+        }
+
+        if (keys["d"] || keys["arrowright"]) {
+            state.x += state.speed;
+            moving = true;
+        }
+
+        if (keys["w"] || keys["arrowup"]) {
+            state.y += state.speed;
+            moving = true;
+        }
+
+        if (keys["s"] || keys["arrowdown"]) {
+            state.y -= state.speed;
+            moving = true;
+        }
+
+        state.x = Math.max(2, Math.min(95, state.x));
+        state.y = Math.max(10, Math.min(38, state.y));
+
+        player.style.left = state.x + "%";
+        player.style.bottom = state.y + "%";
+
+        player.classList.toggle("walking", moving);
+
+        checkNPC();
+    }
+
+    requestAnimationFrame(movementLoop);
+}
+
+movementLoop();
+
+
+/* =====================================
+   NPC DETECTION
+===================================== */
+
+function checkNPC() {
+
+    const lunaX = 62;
+    const lunaY = 25;
+
+    const distance = Math.sqrt(
+        Math.pow(state.x - lunaX,2) +
+        Math.pow(state.y - lunaY,2)
+    );
+
+    if (distance < 8 && !state.dialogueOpen) {
+
+        showNotification("Луна заметила тебя...");
+
+        setTimeout(() => {
+
+            if (!state.dialogueOpen) {
+                lunaDialogue();
+            }
+
+        },1000);
+    }
+}
+
+
+/* =====================================
+   DIALOGUE ENGINE
+===================================== */
+
+function openDialogue(speaker, text, choices=[]) {
+
+    state.dialogueOpen = true;
+
+    document.getElementById("dialogue").style.display = "block";
+
+    document.getElementById("speaker").textContent = speaker;
+
+    document.getElementById("text").textContent = text;
+
+    speak(text);
+
+    const container = document.getElementById("choices");
+
+    container.innerHTML = "";
+
+    choices.forEach(choice => {
+
+        const button = document.createElement("button");
+
+        button.className = "choice";
+
+        button.textContent = choice.text;
+
+        button.onclick = () => {
+
+            choice.action();
+
+        };
+
+        container.appendChild(button);
+
+    });
+}
+
+
+function closeDialogue() {
+
+    state.dialogueOpen = false;
+
+    document.getElementById("dialogue").style.display = "none";
+}
+
+
+/* =====================================
+   LUNA STORY
+===================================== */
+
+function lunaDialogue() {
+
+    if (!state.flags.metLuna) {
+
+        state.flags.metLuna = true;
+
+        openDialogue(
+            "Луна",
+            "Ты тоже это видела? Звезду. Она упала прямо за старой обсерваторией.",
+            [
+                {
+                    text: "Да. Я хочу узнать, что происходит.",
+                    action: () => {
+
+                        state.trust += 1;
+
+                        updateUI();
+
+                        openDialogue(
+                            "Луна",
+                            "Тогда слушай внимательно. Этой ночью нельзя доверять всему, что ты увидишь.",
+                            [
+                                {
+                                    text: "Почему?",
+                                    action: () => {
+
+                                        openDialogue(
+                                            "Луна",
+                                            "Потому что город начинает забывать.",
+                                            [
+                                                {
+                                                    text: "Я тебе верю.",
+                                                    action: () => {
+
+                                                        state.flags.trustedLuna = true;
+                                                        state.trust += 2;
+
+                                                        addItem("Серебряная нить");
+
+                                                        updateUI();
+
+                                                        openDialogue(
+                                                            "Луна",
+                                                            "Тогда возьми это. Когда придёт время, она покажет тебе дорогу.",
+                                                            [
+                                                                {
+                                                                    text: "Продолжить",
+                                                                    action: () => {
+
+                                                                        closeDialogue();
+
+                                                                        updateQuest(
+                                                                            "Найди вход в старую обсерваторию."
+                                                                        );
+
+                                                                    }
+                                                                }
+                                                            ]
+                                                        );
+                                                    }
+                                                },
+
+                                                {
+                                                    text: "Я сначала хочу разобраться сама.",
+                                                    action: () => {
+
+                                                        state.trust -= 1;
+
+                                                        updateUI();
+
+                                                        openDialogue(
+                                                            "Луна",
+                                                            "Разумно. Только помни: иногда слишком долгое сомнение тоже становится выбором.",
+                                                            [
+                                                                {
+                                                                    text: "Уйти",
+                                                                    action: () => {
+
+                                                                        closeDialogue();
+
+                                                                        updateQuest(
+                                                                            "Исследуй город и найди след упавшей звезды."
+                                                                        );
+                                                                    }
+                                                                }
+                                                            ]
+                                                        );
+                                                    }
+                                                }
+                                            ]
+                                        );
+                                    }
+                                }
+                            ]
+                        );
+                    }
+                },
+
+                {
+                    text: "Нет. Я ничего не видела.",
+                    action: () => {
+
+                        state.flags.liedToLuna = true;
+
+                        state.trust -= 2;
+
+                        updateUI();
+
+                        openDialogue(
+                            "Луна",
+                            "Понятно...",
+                            [
+                                {
+                                    text: "Что?",
+                                    action: () => {
+
+                                        openDialogue(
+                                            "Луна",
+                                            "Ничего. Только не удивляйся, если однажды город напомнит тебе об этой лжи.",
+                                            [
+                                                {
+                                                    text: "Уйти",
+                                                    action: () => {
+
+                                                        closeDialogue();
+
+                                                        updateQuest(
+                                                            "Найди упавшую звезду."
+                                                        );
+                                                    }
+                                                }
+                                            ]
+                                        );
+                                    }
+                                }
+                            ]
+                        );
+                    }
+                }
+            ]
+        );
+
+    } else {
+
+        openDialogue(
+            "Луна",
+            state.flags.liedToLuna
+                ? "Я всё ещё помню твой ответ."
+                : "Мы ещё встретимся у обсерватории.",
+            [
+                {
+                    text: "Продолжить",
+                    action: closeDialogue
+                }
+            ]
+        );
+    }
+}
+
+
+/* =====================================
+   INVENTORY
+===================================== */
+
+function addItem(item) {
+
+    if (!state.inventory.includes(item)) {
+
+        state.inventory.push(item);
+
+        showNotification("Получено: " + item);
+
+        updateUI();
+    }
+}
+
+
+/* =====================================
+   QUEST
+===================================== */
+
+function updateQuest(text) {
+
+    document.getElementById("quest").innerHTML =
+        "✦ <b>Задание</b><br>" + text;
+}
+
+
+/* =====================================
+   NOTIFICATION
+===================================== */
+
+function showNotification(text) {
+
+    const el = document.getElementById("notification");
+
+    el.textContent = text;
+
+    el.classList.add("show");
+
+    setTimeout(() => {
+
+        el.classList.remove("show");
+
+    },2200);
+}
+
+
+/* =====================================
+   UI
+===================================== */
+
+function updateUI() {
+
+    document.getElementById("stars").textContent =
+        state.stars;
+
+    document.getElementById("trust").textContent =
+        state.trust;
+
+    document.getElementById("items").textContent =
+        state.inventory.length;
+}
+
+
+/* =====================================
+   VOICE
+===================================== */
+
+function speak(text) {
+
+    if (!("speechSynthesis" in window))
+        return;
+
+    speechSynthesis.cancel();
+
+    const utterance =
+        new SpeechSynthesisUtterance(text);
+
+    utterance.lang = "ru-RU";
+
+    utterance.rate = .9;
+
+    utterance.pitch = 1.05;
+
+    speechSynthesis.speak(utterance);
+}
+
+
+/* =====================================
+   MEMORY MINI GAME
+===================================== */
+
+let firstCard = null;
+let secondCard = null;
+let locked = false;
+let matches = 0;
+
+function startMemoryGame() {
+
+    document.getElementById("minigame").style.display = "flex";
+
+    const symbols = ["✦","☾","✧","★","✦","☾","✧","★"];
+
+    symbols.sort(() => Math.random() - .5);
+
+    const container = document.getElementById("cards");
+
+    container.innerHTML = "";
+
+    firstCard = null;
+    secondCard = null;
+    locked = false;
+    matches = 0;
+
+    symbols.forEach(symbol => {
+
+        const card = document.createElement("button");
+
+        card.className = "card";
+
+        card.dataset.symbol = symbol;
+
+        card.textContent = symbol;
+
+        card.onclick = () => flipCard(card);
+
+        container.appendChild(card);
+    });
+}
+
+
+function flipCard(card) {
+
+    if (
+        locked ||
+        card.classList.contains("open") ||
+        card === firstCard
+    )
+        return;
+
+    card.classList.add("open");
+
+    if (!firstCard) {
+
+        firstCard = card;
+
+        return;
+    }
+
+    secondCard = card;
+
+    if (
+        firstCard.dataset.symbol ===
+        secondCard.dataset.symbol
+    ) {
+
+        matches++;
+
+        firstCard = null;
+        secondCard = null;
+
+        if (matches === 4) {
+
+            state.flags.memorySolved = true;
+
+            state.stars += 3;
+
+            addItem("Осколок звезды");
+
+            updateUI();
+
+            showNotification(
+                "Мини-игра пройдена! Получен осколок звезды."
+            );
+        }
+
+    } else {
+
+        locked = true;
+
+        setTimeout(() => {
+
+            firstCard.classList.remove("open");
+
+            secondCard.classList.remove("open");
+
+            firstCard = null;
+            secondCard = null;
+
+            locked = false;
+
+        },700);
+    }
+}
+
+
+function closeMemoryGame() {
+
+    document.getElementById("minigame").style.display = "none";
+}
+
+
+/* =====================================
+   SAVE
+===================================== */
+
+function saveGame() {
+
+    localStorage.setItem(
+        "lastLightSave",
+        JSON.stringify(state)
+    );
+
+    showNotification("Игра сохранена ✦");
+}
+
+
+function loadGame() {
+
+    const saved =
+        localStorage.getItem("lastLightSave");
+
+    if (!saved) {
+
+        showNotification("Сохранение не найдено.");
+
+        return;
+    }
+
+    const data = JSON.parse(saved);
+
+    Object.assign(state,data);
+
+    updateUI();
+
+    player.style.left = state.x + "%";
+
+    player.style.bottom = state.y + "%";
+
+    showNotification("Игра загружена.");
+}
+
+
+/* =====================================
+   INTRO
+===================================== */
+
+setTimeout(() => {
+
+    openDialogue(
+        "???",
+        "Этой ночью одна звезда упадёт с неба. И после этого город уже никогда не будет прежним.",
+        [
+            {
+                text: "Продолжить",
+                action: () => {
+
+                    openDialogue(
+                        "Рассказчик",
+                        "Ты выходишь на улицу. Впереди — неизвестность.",
+                        [
+                            {
+                                text: "Начать исследование",
+                                action: () => {
+
+                                    closeDialogue();
+
+                                    updateQuest(
+                                        "Найди Луну. Она знает, что произошло."
+                                    );
+
+                                }
+                            }
+                        ]
+                    );
+                }
+            }
+        ]
+    );
+
+},1000);
+
+
+/* =====================================
+   INITIAL UI
+===================================== */
+
+updateUI();
+
+</script>
+
+</body>
+</html>
